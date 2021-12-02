@@ -1,71 +1,145 @@
 package com.company.cipher;
 
+import java.util.ArrayList;
 import java.util.Random;
+import  java.util.List;
 
 public class Kursakal {
+
     int maxn = 100;
-    int maxn_n = maxn * (maxn-1)/2;
-    int[][] array;
-    int [] mark = new int[maxn];
-    int n, k, t;
+    int maxm = 10000;
+    int inf = Integer.MAX_VALUE/2;
+    List<Edge> a = new ArrayList();
+    List<Integer> s = new ArrayList();
+    List<Integer> r = new ArrayList();
+    Long m, n;
+    Long mst_weight = Long.MAX_VALUE;
 
-    public Kursakal(int n, int m) {
-        this.array = new int[3][maxn_n];
-        this.maxn_n = m;
-        this.maxn = n;
+    void init(){
+        mst_weight = 0l;
+
+    }
+
+    public Kursakal(Long m, Long n) {
+        this.m = m;
+        this.n = n;
+        mst_weight = 0l;
         for (int i=0; i<m; i++){
-            for (int j=0; j<3; j++){
-                Random r = new Random();
-                array[j][i] = r.nextInt(9)+1;
-            }
-        }
-        for (int i=0; i<m-1; i++){
-            for (int j=i+1; j<m; j++){
-                if (array[2][i]>array[2][j]){
-                    for (int t1=0; t1<3; t1++){
-                        k = array[t1][i];
-                        array[t1][i]= array[0][j];
-                        array[t1][j]=k;
-                    }
-                }
-            }
-        }
-        for (int i = 0; i < maxn; i++) {
-            mark[i] = i;
-        }
-        k = 0;
-        t = m;
-        int i = 1;
-        while (k<n-1){
-            i = 0;
-            while ((i <= t) && (mark[array[0][i]] == mark[array[2][ i]]) && (array[0][ i] != 0)){
-                i++; k++;
-                if (array[0][i] * array[2][ i] != 0){
-                    System.out.println(array[0][i]+"; "+array[1][i]+"; "+array[2][i]);
-                    changeMark(array[0][i], array[1][i]);
-                }
-            }
+            Edge item = new Edge();
+            Random r = new Random();
+            item.x = r.nextInt(2)+1;
+            item.y = r.nextInt(2)+1;
+            item.w = r.nextInt(2)+1;
+            a.add(item);
         }
     }
-    public void print(){
-        for (int i=0; i<3; i++){
-            for (int j=0; j<maxn_n; j++){
-                System.out.print(array[i][j]+"; ");
+    void swap(Edge e1, Edge e2){
+        Edge e3 = e1;
+        e1 = e2;
+        e2 = e3;
+    }
+
+    void qSort(int l, int r){
+        int i = l;
+        int j = r-1;
+        Random rand = new Random();
+        long ind = a.get(l+rand.nextInt(a.size()-1)).w;
+         while (ind>=a.size()){
+             ind--;
+         }
+         long x = a.get((int)ind).w;
+
+        do{
+            while (a.get(j).w >x) j--;
+            while (a.get(i).w < x) i++;
+            if (i<=j){
+                swap(a.get(i), a.get(j));
+                if (i>0 && j>0){
+                    i++;
+                    j--;
+                }
+
+               // break;
             }
-            System.out.println();
+        }
+        while (i>j);
+        if (i>0 && j>0){
+            if (l<j) qSort(l, j);
+            if (l<r) qSort(i, r);
+        }
+
+    }
+
+
+
+    public void execute()
+    {
+        qSort(0, m.intValue());
+        for (int i=0; i<n; i++){
+            r.add(i);
+            s.add(0);
+        }
+        int k = 0;
+        long p=-1; long q = -1;
+        for (int i =0; i<n-1; i++){
+            do{
+                k++;
+                p= a.get(k).x; q = a.get(k).y;
+                while (r.get((int)p)!=p){
+                    p = r.get((int)p);
+                }
+                while (r.get((int)q)!=q){
+                    q= r.get((int)q);
+                }
+            }
+            while (q!=q);
+           System.out.println(a.get(k).x+" "+a.get(k).y);
+           mst_weight = mst_weight + a.get(k).w;
+           if (s.get((int)p)!=s.get((int)q)){
+               r.set((int)p,(int)q);
+               s.set((int)q, s.get((int)p)+s.get((int)q));
+           }
+           else{
+               r.set((int)q, (int)p);
+               s.set((int)p, s.get((int)p)+s.get((int)q));
+           }
         }
     }
 
-    void changeMark(int l, int m){
-        int i, t;
-        if (m<l){
-            t=l;
-            l=m;
-            m=t;
+    public Long getResult() {
+        return mst_weight;
+    }
+
+
+    final class Edge{
+       Integer x;
+
+       Integer y;
+
+       Integer w;
+
+        public Integer getX() {
+            return x;
         }
-        for (int j = 0; j < n; j++) {
-            if (mark[j] ==m)
-                mark[j] = l;
+
+        public void setX(Integer x) {
+            this.x = x;
+        }
+
+        public Integer getY() {
+            return y;
+        }
+
+        public void setY(Integer y) {
+            this.y = y;
+        }
+
+        public Integer getW() {
+            return w;
+        }
+
+        public void setW(Integer w) {
+            this.w = w;
         }
     }
 }
