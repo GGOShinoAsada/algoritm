@@ -77,7 +77,7 @@ public class Prima {
     }
     public void addEdge(int w, int v, int weight) {
         assert w >= 0 && w < vertexNum && v >= 0 && v < vertexNum;
-        // Получаем список краев w и добавляем отношение w-> v
+
         List<Edge> edges1 = graph[w];
         Edge newEdge1 = new Edge(w, v, weight);
         edges1.add(newEdge1);
